@@ -1,0 +1,122 @@
+package com.example.bakingapp.UI;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
+import com.example.bakingapp.Adapters.RecipesAdapter;
+import com.example.bakingapp.Models.Recipes;
+import com.example.bakingapp.R;
+import com.example.bakingapp.Utils.JsonUtils;
+import com.example.bakingapp.Utils.NetworkUtil;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements RecipesAdapter.ListItemClickListener {
+
+    private static final String TAG = MainActivity.class.getSimpleName() ;
+    ArrayList<Recipes> recipes = new ArrayList<>();
+    RecyclerView recipesRecyclerView;
+    TextView errorMessage;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        errorMessage = findViewById(R.id.error_message);
+        recipesRecyclerView = findViewById(R.id.recipes_recycler_view);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,numberOfColumns());
+        recipesRecyclerView.setLayoutManager(gridLayoutManager);
+
+        URL url = NetworkUtil.buildUrl();
+        Log.d(TAG, "onCreate: url "+url);
+        new RecipesQueryTask().execute(url);
+
+        setRecipesAdapter();
+
+    }
+
+    private void setRecipesAdapter() {
+        Log.d(TAG, "setRecipesAdapter: "+recipes);
+        RecipesAdapter recipesAdapter = new RecipesAdapter(recipes,this);
+        recipesRecyclerView.setHasFixedSize(true);
+        recipesRecyclerView.setAdapter(recipesAdapter);
+    }
+
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int widthDivider = 800;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 1;
+        return nColumns;
+    }
+
+    @Override
+    public void onListClickItem(int clickedItemIndex) {
+        Intent intent = new Intent(this, StepsActivity.class);
+        intent.putExtra("recipes",recipes.get(clickedItemIndex));
+        startActivity(intent);
+    }
+
+    public class RecipesQueryTask extends AsyncTask<URL, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            URL url = urls[0];
+            String mResult = null;
+            try {
+                mResult = NetworkUtil.getResponseFromHttpURL(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return mResult;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            if (s != null && !s.equals("")) {
+                showJsonData();
+                try {
+                    recipes = JsonUtils.parseRecipesJson(s);
+                    setRecipesAdapter();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                showErrorMassage();
+            }
+        }
+    }
+
+    private void showErrorMassage() {
+        recipesRecyclerView.setVisibility(View.INVISIBLE);
+        errorMessage.setVisibility(View.VISIBLE);
+    }
+    private void showJsonData(){
+        recipesRecyclerView.setVisibility(View.VISIBLE);
+        errorMessage.setVisibility(View.INVISIBLE);
+    }
+
+}

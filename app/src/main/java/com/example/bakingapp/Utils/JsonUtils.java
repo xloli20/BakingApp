@@ -21,11 +21,11 @@ public final class JsonUtils {
 
         ArrayList<Recipes> recipesArrayList = new ArrayList<>();
 
-            for (int i = 0; i <= results.length(); i++) {
+            for (int i = 0; i <= 3; i++) {
                 JSONObject movieData = results.getJSONObject(i);
                 Recipes recipe = new Recipes(
-                        movieData.optString("id"),
-                        movieData.optString("name")
+                        movieData.optString("name"),
+                        movieData.optString("id")
                 );
                 recipesArrayList.add(recipe);
 

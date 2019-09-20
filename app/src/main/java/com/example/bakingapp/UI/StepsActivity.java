@@ -2,14 +2,17 @@ package com.example.bakingapp.UI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.bakingapp.Adapters.StepsAdapter;
+import com.example.bakingapp.Models.Recipes;
 import com.example.bakingapp.Models.RecipesIngredients;
 import com.example.bakingapp.Models.RecipesSteps;
 
@@ -21,7 +24,13 @@ import android.widget.TextView;
 
 import com.example.bakingapp.Models.DummyContent;
 import com.example.bakingapp.R;
+import com.example.bakingapp.Utils.JsonUtils;
+import com.example.bakingapp.Utils.NetworkUtil;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +42,14 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class StepsActivity extends AppCompatActivity {
+public class StepsActivity extends AppCompatActivity implements StepsAdapter.ListItemClickListener {
+    private static final String TAG = StepsActivity.class.getSimpleName() ;
 
     ArrayList<RecipesIngredients> ingredients;
 
     ArrayList<RecipesSteps> steps;
-    RecyclerView stepsRecyclerView;
-    StepsAdapter stepsAdapter;
-
+    RecyclerView recyclerView;
+    Recipes recipes;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -51,11 +60,13 @@ public class StepsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
+        final Intent intent = getIntent();
+        recipes = intent.getParcelableExtra("recipes");
+        Log.d(TAG, "onCreate: recipes "+recipes.getrId());
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -65,22 +76,42 @@ public class StepsActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        View recyclerView = findViewById(R.id.item_list);
+        recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        ((RecyclerView) recyclerView).setLayoutManager(linearLayoutManager);
+
+        URL url = NetworkUtil.buildUrl();
+        new StepsQueryTask().execute(url);
+
+        setStepsAdapter();
+    }
+
+    private void setStepsAdapter() {
+        Log.d(TAG, "setStepsAdapter: " +steps);
+        StepsAdapter stepsAdapter = new StepsAdapter(steps,this);
+        ((RecyclerView) recyclerView).setHasFixedSize(true);
+        ((RecyclerView) recyclerView).setAdapter(stepsAdapter);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
     }
 
+    @Override
+    public void onListClickItem(int clickedItemIndex) {
+
+    }
+
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private static final String TAG = SimpleItemRecyclerViewAdapter.class.getSimpleName() ;
-        private final StepsActivity mParentActivity;
+        private final StepsActivity mParentActivity;//
         private final List<DummyContent.DummyItem> mValues;
-        private final boolean mTwoPane;
+        private final boolean mTwoPane;//
+
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,9 +151,7 @@ public class StepsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            Log.d(TAG, "onBindViewHolder: "+holder.mIdView);
             holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -135,12 +164,51 @@ public class StepsActivity extends AppCompatActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mIdView;
-            final TextView mContentView;
 
             ViewHolder(View view) {
                 super(view);
                 mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+            }
+        }
+    }
+
+    public class StepsQueryTask extends AsyncTask<URL, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            URL url = urls[0];
+            String mResult = null;
+            try {
+                mResult = NetworkUtil.getResponseFromHttpURL(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return mResult;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            if (s != null && !s.equals("")) {
+                ((RecyclerView) recyclerView).setVisibility(View.VISIBLE);
+
+                try {
+                    Log.d(TAG, "onPostExecute: steps "+steps);
+                    Log.d(TAG, "onPostExecute: steps "+s);
+                    Log.d(TAG, "onPostExecute: steps "+recipes);
+
+                    steps = JsonUtils.parseStepsJson(s,recipes.getrId());
+                    setStepsAdapter();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
             }
         }
     }

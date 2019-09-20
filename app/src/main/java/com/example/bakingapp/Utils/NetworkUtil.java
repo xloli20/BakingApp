@@ -21,7 +21,7 @@ public final class NetworkUtil {
 
 
 
-    public static URL buildUrl(String Query) {
+    public static URL buildUrl() {
         Uri builtUri = Uri.parse(RECIPES_BASE_URL).buildUpon()
                 .build();
 
