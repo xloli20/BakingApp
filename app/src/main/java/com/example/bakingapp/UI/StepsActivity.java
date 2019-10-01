@@ -1,11 +1,9 @@
 package com.example.bakingapp.UI;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,12 +15,9 @@ import com.example.bakingapp.Models.RecipesIngredients;
 import com.example.bakingapp.Models.RecipesSteps;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.bakingapp.Models.DummyContent;
 import com.example.bakingapp.R;
 import com.example.bakingapp.Utils.JsonUtils;
 import com.example.bakingapp.Utils.NetworkUtil;
@@ -32,29 +27,32 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An activity representing a list of Items. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
  * lead to a {@link ItemDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
+ * item sVideoUrl. On tablets, the activity presents the list of items and
+ * item sVideoUrl side-by-side using two vertical panes.
  */
 public class StepsActivity extends AppCompatActivity implements StepsAdapter.ListItemClickListener {
     private static final String TAG = StepsActivity.class.getSimpleName() ;
 
-    ArrayList<RecipesIngredients> ingredients;
+    private ArrayList<RecipesIngredients> ingredients;
+    private TextView ingredientsTextView;
 
-    ArrayList<RecipesSteps> steps;
-    RecyclerView recyclerView;
-    Recipes recipes;
+    private ArrayList<RecipesSteps> steps;
+    private RecyclerView stepsRecyclerView;
+    private Recipes recipes;
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
+    private StepsActivity mParentActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,98 +74,92 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             mTwoPane = true;
         }
 
-        recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        stepsRecyclerView = findViewById(R.id.item_list);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
-        ((RecyclerView) recyclerView).setLayoutManager(linearLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL,false);
+        stepsRecyclerView.setLayoutManager(linearLayoutManager);
 
         URL url = NetworkUtil.buildUrl();
         new StepsQueryTask().execute(url);
 
-        setStepsAdapter();
+        new IngredientsQueryTask().execute(url);
+    }
+
+    private void setIngredientsTextView(){
+        ingredientsTextView = findViewById(R.id.ingredients);
+        ingredientsTextView.setText("");
+        for (int i=0 ; i<=9 ; i++){
+            ingredientsTextView.append(ingredients.get(i).getrIngredient());
+            ingredientsTextView.append(" ");
+            ingredientsTextView.append(ingredients.get(i).getiQuantity());
+            ingredientsTextView.append(" ");
+            ingredientsTextView.append(ingredients.get(i).getiMeasure());
+            ingredientsTextView.append("\n");
+
+        }
     }
 
     private void setStepsAdapter() {
         Log.d(TAG, "setStepsAdapter: " +steps);
         StepsAdapter stepsAdapter = new StepsAdapter(steps,this);
-        ((RecyclerView) recyclerView).setHasFixedSize(true);
-        ((RecyclerView) recyclerView).setAdapter(stepsAdapter);
-    }
-
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        stepsRecyclerView.setHasFixedSize(true);
+        stepsRecyclerView.setAdapter(stepsAdapter);
     }
 
     @Override
     public void onListClickItem(int clickedItemIndex) {
-
+        if (mTwoPane) {
+            Bundle arguments = new Bundle();
+            arguments.putString(ItemDetailFragment.ARG_ITEM_ID, String.valueOf(clickedItemIndex));
+            ItemDetailFragment fragment = new ItemDetailFragment();
+            fragment.setArguments(arguments);
+            mParentActivity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.item_detail_container, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, ItemDetailActivity.class);
+            intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, String.valueOf(clickedItemIndex));
+            intent.putExtra("steps",steps.get(clickedItemIndex));
+            startActivity(intent);
+        }
     }
 
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    public class IngredientsQueryTask extends AsyncTask<URL, Void, String> {
 
-        private final StepsActivity mParentActivity;//
-        private final List<DummyContent.DummyItem> mValues;
-        private final boolean mTwoPane;//
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
-
-                    context.startActivity(intent);
-                }
+        @Override
+        protected String doInBackground(URL... urls) {
+            URL url = urls[0];
+            String mResult = null;
+            try {
+                mResult = NetworkUtil.getResponseFromHttpURL(url);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        };
-
-        SimpleItemRecyclerViewAdapter(StepsActivity parent,
-                                      List<DummyContent.DummyItem> items,
-                                      boolean twoPane) {
-            mValues = items;
-            mParentActivity = parent;
-            mTwoPane = twoPane;
+            return mResult;
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.steps_items, parent, false);
-            return new ViewHolder(view);
-        }
+        protected void onPostExecute(String s) {
 
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
+            if (s != null && !s.equals("")) {
 
-            holder.itemView.setTag(mValues.get(position));
-            holder.itemView.setOnClickListener(mOnClickListener);
-        }
+                try {
+                    Log.d(TAG, "onPostExecute: steps "+ingredients);
+                    Log.d(TAG, "onPostExecute: recipes.getrId() "+recipes.getrId());
 
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
+                    ingredients = JsonUtils.parseIngredientsJson(s,1);
+                    Log.d(TAG, "onPostExecute: steps "+ingredients);
+                    setIngredientsTextView();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-
-            ViewHolder(View view) {
-                super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
+            } else {
             }
         }
     }
@@ -195,14 +187,14 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         protected void onPostExecute(String s) {
 
             if (s != null && !s.equals("")) {
-                ((RecyclerView) recyclerView).setVisibility(View.VISIBLE);
+                stepsRecyclerView.setVisibility(View.VISIBLE);
 
                 try {
                     Log.d(TAG, "onPostExecute: steps "+steps);
-                    Log.d(TAG, "onPostExecute: steps "+s);
-                    Log.d(TAG, "onPostExecute: steps "+recipes);
+                    Log.d(TAG, "onPostExecute: recipes.getrId() "+recipes.getrId());
 
-                    steps = JsonUtils.parseStepsJson(s,recipes.getrId());
+                    steps = JsonUtils.parseStepsJson(s,1);
+                    Log.d(TAG, "onPostExecute: steps "+steps);
                     setStepsAdapter();
                 } catch (JSONException e) {
                     e.printStackTrace();

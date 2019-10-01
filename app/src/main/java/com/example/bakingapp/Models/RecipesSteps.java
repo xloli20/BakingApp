@@ -6,18 +6,21 @@ import android.os.Parcelable;
 public class RecipesSteps extends Recipes implements Parcelable {
     private String sId;
     private String sDescription;
+    private String sInstructions;
     private String sVideoUrl;
 
-    public RecipesSteps(String sId, String sDescription, String sVideoUrl) {
+    public RecipesSteps(String sId, String sDescription, String sVideoUrl, String sInstructions) {
         this.sId = sId;
         this.sDescription = sDescription;
         this.sVideoUrl = sVideoUrl;
+        this.sInstructions = sInstructions;
     }
 
     protected RecipesSteps(Parcel in) {
         sId = in.readString();
         sDescription = in.readString();
         sVideoUrl = in.readString();
+        sInstructions = in.readString();
     }
 
     public static final Creator<RecipesSteps> CREATOR = new Creator<RecipesSteps>() {
@@ -56,6 +59,13 @@ public class RecipesSteps extends Recipes implements Parcelable {
         this.sVideoUrl = sVideoUrl;
     }
 
+    public String getsInstructions() {
+        return sInstructions;
+    }
+
+    public void setsInstructions(String sInstructions) {
+        this.sInstructions = sInstructions;
+    }
     @Override
     public int describeContents() {
         return 0;
@@ -66,5 +76,6 @@ public class RecipesSteps extends Recipes implements Parcelable {
         parcel.writeString(sId);
         parcel.writeString(sDescription);
         parcel.writeString(sVideoUrl);
+        parcel.writeString(sInstructions);
     }
 }

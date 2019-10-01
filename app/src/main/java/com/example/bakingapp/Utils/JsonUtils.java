@@ -25,7 +25,7 @@ public final class JsonUtils {
                 JSONObject movieData = results.getJSONObject(i);
                 Recipes recipe = new Recipes(
                         movieData.optString("name"),
-                        movieData.optString("id")
+                        movieData.optString("sId")
                 );
                 recipesArrayList.add(recipe);
 
@@ -36,20 +36,21 @@ public final class JsonUtils {
 
     }
 
-    public static ArrayList<RecipesSteps> parseStepsJson(String json, String recipesId ) throws JSONException {
+    public static ArrayList<RecipesSteps> parseStepsJson(String json, int recipesId ) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(Integer.valueOf(recipesId));
+        JSONObject jsonObject = root.getJSONObject(recipesId);
         JSONArray results = jsonObject.optJSONArray("steps");
 
         ArrayList<RecipesSteps> stepsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= results.length(); i++) {
+        for (int i = 0; i <= 9; i++) {
             JSONObject stepsData = results.getJSONObject(i);
             RecipesSteps steps = new RecipesSteps(
-                    stepsData.optString("id"),
-                    stepsData.optString("description"),
-                    stepsData.optString("videoURL")
+                    stepsData.optString("sId"),
+                    stepsData.optString("shortDescription"),
+                    stepsData.optString("videoURL"),
+                    stepsData.getString("description")
             );
             stepsArrayList.add(steps);
 
@@ -60,15 +61,15 @@ public final class JsonUtils {
 
     }
 
-    public static ArrayList<RecipesIngredients> parseIngredientsJson(String json, String recipesId ) throws JSONException {
+    public static ArrayList<RecipesIngredients> parseIngredientsJson(String json, int recipesId ) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(Integer.valueOf(recipesId));
+        JSONObject jsonObject = root.getJSONObject(recipesId);
         JSONArray results = jsonObject.optJSONArray("ingredients");
 
         ArrayList<RecipesIngredients> IngredientsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= results.length(); i++) {
+        for (int i = 0; i <= 9; i++) {
             JSONObject IngredientsData = results.getJSONObject(i);
             RecipesIngredients Ingredients = new RecipesIngredients(
                     IngredientsData.optString("ingredient"),
