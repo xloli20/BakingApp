@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,10 +62,13 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         final Intent intent = getIntent();
         recipes = intent.getParcelableExtra("recipes");
-        Log.d(TAG, "onCreate: recipes "+recipes.getrId());
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -110,15 +114,14 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     public void onListClickItem(int clickedItemIndex) {
         if (mTwoPane) {
             Bundle arguments = new Bundle();
-            arguments.putString(ItemDetailFragment.ARG_ITEM_ID, String.valueOf(clickedItemIndex));
+            arguments.putString("step",steps.get(clickedItemIndex).getsInstructions());
             ItemDetailFragment fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
-            mParentActivity.getSupportFragmentManager().beginTransaction()
+            this.getSupportFragmentManager().beginTransaction()
                     .replace(R.id.item_detail_container, fragment)
                     .commit();
         } else {
             Intent intent = new Intent(this, ItemDetailActivity.class);
-            intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, String.valueOf(clickedItemIndex));
             intent.putExtra("steps",steps.get(clickedItemIndex));
             startActivity(intent);
         }
