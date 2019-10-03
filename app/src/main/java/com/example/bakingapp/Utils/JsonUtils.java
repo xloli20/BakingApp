@@ -21,11 +21,11 @@ public final class JsonUtils {
 
         ArrayList<Recipes> recipesArrayList = new ArrayList<>();
 
-            for (int i = 0; i <= 3; i++) {
+            for (int i = 0; i <= results.length()-1 ; i++) {
                 JSONObject movieData = results.getJSONObject(i);
                 Recipes recipe = new Recipes(
                         movieData.optString("name"),
-                        movieData.optString("sId")
+                        movieData.optString("id")
                 );
                 recipesArrayList.add(recipe);
 
@@ -44,10 +44,10 @@ public final class JsonUtils {
 
         ArrayList<RecipesSteps> stepsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= 9; i++) {
+        for (int i = 0; i <= results.length()-1 ; i++) {
             JSONObject stepsData = results.getJSONObject(i);
             RecipesSteps steps = new RecipesSteps(
-                    stepsData.optString("sId"),
+                    stepsData.optString("id"),
                     stepsData.optString("shortDescription"),
                     stepsData.optString("videoURL"),
                     stepsData.getString("description")
@@ -69,7 +69,7 @@ public final class JsonUtils {
 
         ArrayList<RecipesIngredients> IngredientsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= 9; i++) {
+        for (int i = 0; i <= results.length()-1 ; i++) {
             JSONObject IngredientsData = results.getJSONObject(i);
             RecipesIngredients Ingredients = new RecipesIngredients(
                     IngredientsData.optString("ingredient"),

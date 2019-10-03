@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Li
     }
 
     private void setRecipesAdapter() {
-        Log.d(TAG, "setRecipesAdapter: "+recipes);
         RecipesAdapter recipesAdapter = new RecipesAdapter(recipes,this);
         recipesRecyclerView.setHasFixedSize(true);
         recipesRecyclerView.setAdapter(recipesAdapter);
@@ -61,14 +60,13 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Li
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int widthDivider = 800;
         int width = displayMetrics.widthPixels;
-        int nColumns = width / widthDivider;
-        if (nColumns < 2) return 1;
-        return nColumns;
+        return width / widthDivider;
     }
 
     @Override
     public void onListClickItem(int clickedItemIndex) {
         Intent intent = new Intent(this, StepsActivity.class);
+        Log.d(TAG, "onListClickItem: recipes "+recipes.get(clickedItemIndex).getrId());
         intent.putExtra("recipes",recipes.get(clickedItemIndex));
         startActivity(intent);
     }
@@ -115,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Li
         errorMessage.setVisibility(View.VISIBLE);
     }
     private void showJsonData(){
-        recipesRecyclerView.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.INVISIBLE);
+        recipesRecyclerView.setVisibility(View.VISIBLE);
     }
 
 }

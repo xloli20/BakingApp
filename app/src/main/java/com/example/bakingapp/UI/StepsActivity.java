@@ -62,13 +62,15 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
         final Intent intent = getIntent();
         recipes = intent.getParcelableExtra("recipes");
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(recipes.getrName());
+        }
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -99,7 +101,6 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             ingredientsTextView.append(" ");
             ingredientsTextView.append(ingredients.get(i).getiMeasure());
             ingredientsTextView.append("\n");
-
         }
     }
 
@@ -193,10 +194,8 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
                 stepsRecyclerView.setVisibility(View.VISIBLE);
 
                 try {
-                    Log.d(TAG, "onPostExecute: steps "+steps);
-                    Log.d(TAG, "onPostExecute: recipes.getrId() "+recipes.getrId());
 
-                    steps = JsonUtils.parseStepsJson(s,1);
+                    steps = JsonUtils.parseStepsJson(s,Integer.valueOf(recipes.getrId()));
                     Log.d(TAG, "onPostExecute: steps "+steps);
                     setStepsAdapter();
                 } catch (JSONException e) {
