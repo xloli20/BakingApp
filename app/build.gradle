@@ -31,4 +31,8 @@ dependencies {
 
     //Scalable DP
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
+
+    //exoPlayer
+    implementation 'com.google.android.exoplayer:exoplayer:2.7.0'
+
 }

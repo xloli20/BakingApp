@@ -3,6 +3,8 @@ package com.example.bakingapp.UI;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.bakingapp.Models.Recipes;
+import com.example.bakingapp.Models.RecipesSteps;
 import com.example.bakingapp.R;
 import com.example.bakingapp.UI.ItemDetailFragment;
 import com.example.bakingapp.UI.StepsActivity;
@@ -11,12 +13,14 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.ActionBar;
 
 import android.view.MenuItem;
+import android.widget.TextView;
 
 /**
  * An activity representing a single Item detail screen. This
@@ -25,7 +29,9 @@ import android.view.MenuItem;
  * in a {@link StepsActivity}.
  */
 public class ItemDetailActivity extends AppCompatActivity {
+    private final static String TAG = ItemDetailActivity.class.getSimpleName();
 
+    //private TextView instructionTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +54,12 @@ public class ItemDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+//        instructionTextView = findViewById(R.id.instruction);
+//
+//        Intent intent = getIntent();
+//        RecipesSteps recipesSteps = intent.getParcelableExtra("steps");
+//        Log.d(TAG, "onCreate: instructions "+recipesSteps.getsInstructions());
+//        instructionTextView.setText(recipesSteps.getsInstructions());
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
         // (e.g. when rotating the screen from portrait to landscape).
