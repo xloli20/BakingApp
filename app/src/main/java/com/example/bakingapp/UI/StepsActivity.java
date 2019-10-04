@@ -116,6 +116,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         if (mTwoPane) {
             Bundle arguments = new Bundle();
             arguments.putString("step",steps.get(clickedItemIndex).getsInstructions());
+            arguments.putString("video",steps.get(clickedItemIndex).getsVideoUrl());
             ItemDetailFragment fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
             this.getSupportFragmentManager().beginTransaction()

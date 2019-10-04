@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
@@ -43,7 +44,7 @@ public class ItemDetailFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "item_id";
 
-    Context context;
+    private Context context;
     private PlayerView playerView;
     private SimpleExoPlayer simpleExoPlayer;
 
@@ -81,7 +82,10 @@ public class ItemDetailFragment extends Fragment {
 
         if (getArguments().containsKey("step")) {
             String step = getArguments().getString("step");
+            String video = getArguments().getString("video");
             instructionTextView.setText(step);
+            initializePlayer(Uri.parse(video));
+
         } else {
             Intent intent = getActivity().getIntent();
             RecipesSteps steps = intent.getParcelableExtra("steps");
@@ -98,11 +102,11 @@ public class ItemDetailFragment extends Fragment {
             // Bind the player to the view.
             playerView.setPlayer(simpleExoPlayer);
             // Produces DataSource instances through which media data is loaded.
-            String userAgent = Util.getUserAgent(context, "Baking App");
+            String userAgent = Util.getUserAgent(context, "BakingApp");
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, userAgent);
             // This is the MediaSource representing the media to be played.
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, dataSourceFactory,
-                    new DefaultExtractorsFactory(), null, null);
+            MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaUri);
 
             // Prepare the player with the source.
             simpleExoPlayer.prepare(mediaSource);
