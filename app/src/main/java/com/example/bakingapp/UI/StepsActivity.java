@@ -3,22 +3,14 @@ package com.example.bakingapp.UI;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.bakingapp.Adapters.StepsAdapter;
 import com.example.bakingapp.Models.Recipes;
 import com.example.bakingapp.Models.RecipesIngredients;
 import com.example.bakingapp.Models.RecipesSteps;
-
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-
 import com.example.bakingapp.R;
 import com.example.bakingapp.Utils.JsonUtils;
 import com.example.bakingapp.Utils.NetworkUtil;
@@ -28,6 +20,12 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * An activity representing a list of Items. This activity
@@ -157,7 +155,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
                     Log.d(TAG, "onPostExecute: steps "+ingredients);
                     Log.d(TAG, "onPostExecute: recipes.getrId() "+recipes.getrId());
 
-                    ingredients = JsonUtils.parseIngredientsJson(s,1);
+                    ingredients = JsonUtils.parseIngredientsJson(s,Integer.valueOf(recipes.getrId()));
                     Log.d(TAG, "onPostExecute: steps "+ingredients);
                     setIngredientsTextView();
                 } catch (JSONException e) {

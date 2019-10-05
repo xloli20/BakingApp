@@ -39,7 +39,7 @@ public final class JsonUtils {
     public static ArrayList<RecipesSteps> parseStepsJson(String json, int recipesId ) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(recipesId);
+        JSONObject jsonObject = root.getJSONObject(recipesId-1);
         JSONArray results = jsonObject.optJSONArray("steps");
 
         ArrayList<RecipesSteps> stepsArrayList = new ArrayList<>();
@@ -64,7 +64,7 @@ public final class JsonUtils {
     public static ArrayList<RecipesIngredients> parseIngredientsJson(String json, int recipesId ) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(recipesId);
+        JSONObject jsonObject = root.getJSONObject(recipesId-1);
         JSONArray results = jsonObject.optJSONArray("ingredients");
 
         ArrayList<RecipesIngredients> IngredientsArrayList = new ArrayList<>();
