@@ -3,35 +3,33 @@ package com.example.bakingapp.UI;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.bakingapp.Models.RecipesSteps;
 import com.example.bakingapp.R;
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-import androidx.fragment.app.Fragment;
+import java.util.Objects;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import androidx.fragment.app.Fragment;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -56,27 +54,12 @@ public class ItemDetailFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy sDescription specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load sDescription from a sDescription provider.
-
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(" ");
-            }
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
         context = container.getContext();
+
+        //views
         TextView instructionTextView = rootView.findViewById(R.id.instruction);
         playerView = rootView.findViewById(R.id.playerView);
 
@@ -91,7 +74,33 @@ public class ItemDetailFragment extends Fragment {
             RecipesSteps steps = intent.getParcelableExtra("steps");
             instructionTextView.setText(steps.getsInstructions());
             initializePlayer(Uri.parse(steps.getsVideoUrl()));
+
+            Activity activity = this.getActivity();
+            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+            if (appBarLayout != null) {
+                appBarLayout.setTitle(steps.getsDescription());
+            }
         }
+
+        //check orientation and full screen the video if it's landscape
+        int orientation = this.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            ViewGroup.LayoutParams params = playerView.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = height-2;
+            playerView.setLayoutParams(params);
+
+            Activity activity = this.getActivity();
+            AppBarLayout appBarLayout = activity.findViewById(R.id.app_bar);
+            ViewGroup.LayoutParams params2 = appBarLayout.getLayoutParams();
+            params2.height = 0;
+            appBarLayout.setLayoutParams(params2);
+
+        }
+
         return rootView;
     }
 
