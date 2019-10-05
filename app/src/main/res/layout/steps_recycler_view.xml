@@ -36,7 +36,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_4sdp"
-                android:text="@string/bla"
                 android:textColor="#ffffff"
                 android:textSize="17sp" />
         </LinearLayout>

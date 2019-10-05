@@ -40,8 +40,6 @@ import androidx.fragment.app.Fragment;
 public class ItemDetailFragment extends Fragment {
     private static final String TAG = ItemDetailFragment.class.getSimpleName();
 
-    public static final String ARG_ITEM_ID = "item_id";
-
     private Context context;
     private PlayerView playerView;
     private SimpleExoPlayer simpleExoPlayer;
