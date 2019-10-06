@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bakingapp.Models.RecipesSteps;
@@ -26,7 +27,9 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import androidx.fragment.app.Fragment;
@@ -44,6 +47,11 @@ public class ItemDetailFragment extends Fragment {
     private PlayerView playerView;
     private SimpleExoPlayer simpleExoPlayer;
 
+    private RecipesSteps currentStep;
+    private ArrayList<RecipesSteps> steps;
+
+    private TextView instructionTextView;
+    private CollapsingToolbarLayout appBarLayout;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -58,7 +66,7 @@ public class ItemDetailFragment extends Fragment {
         context = container.getContext();
 
         //views
-        TextView instructionTextView = rootView.findViewById(R.id.instruction);
+        instructionTextView = rootView.findViewById(R.id.instruction);
         playerView = rootView.findViewById(R.id.playerView);
 
         if (getArguments().containsKey("step")) {
@@ -69,16 +77,61 @@ public class ItemDetailFragment extends Fragment {
 
         } else {
             Intent intent = getActivity().getIntent();
-            RecipesSteps steps = intent.getParcelableExtra("steps");
-            instructionTextView.setText(steps.getsInstructions());
-            initializePlayer(Uri.parse(steps.getsVideoUrl()));
+            currentStep = intent.getParcelableExtra("steps");
+            steps = intent.getParcelableArrayListExtra("step_list");
+            instructionTextView.setText(currentStep.getsInstructions());
+            initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
 
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+            appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(steps.getsDescription());
+                appBarLayout.setTitle(currentStep.getsDescription());
             }
         }
+
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
+                    int sid = Integer.valueOf(currentStep.getsId()) +1;
+                    currentStep = steps.get(sid);
+                    appBarLayout.setTitle(currentStep.getsDescription());
+                    instructionTextView.setText(currentStep.getsInstructions());
+                    releasePlayer();
+                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+                }
+            }
+        });
+        Button nextButton = rootView.findViewById(R.id.next_step);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
+                    int sid = Integer.valueOf(currentStep.getsId()) +1;
+                    currentStep = steps.get(sid);
+                    appBarLayout.setTitle(currentStep.getsDescription());
+                    instructionTextView.setText(currentStep.getsInstructions());
+                    releasePlayer();
+                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+                }
+            }
+        });
+
+        Button prevButton = rootView.findViewById(R.id.prev_step);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Integer.valueOf(currentStep.getsId()) > 0){
+                    int sid = Integer.valueOf(currentStep.getsId()) -1;
+                    currentStep = steps.get(sid);
+                    appBarLayout.setTitle(currentStep.getsDescription());
+                    instructionTextView.setText(currentStep.getsInstructions());
+                    releasePlayer();
+                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+                }
+            }
+        });
 
         //check orientation and full screen the video if it's landscape
         int orientation = this.getResources().getConfiguration().orientation;
@@ -88,15 +141,12 @@ public class ItemDetailFragment extends Fragment {
             int height = displayMetrics.heightPixels;
             ViewGroup.LayoutParams params = playerView.getLayoutParams();
             params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            params.height = height-2;
+            params.height = height;
             playerView.setLayoutParams(params);
 
             Activity activity = this.getActivity();
             AppBarLayout appBarLayout = activity.findViewById(R.id.app_bar);
-            ViewGroup.LayoutParams params2 = appBarLayout.getLayoutParams();
-            params2.height = 0;
-            appBarLayout.setLayoutParams(params2);
-
+            appBarLayout.setVisibility(View.GONE);
         }
 
         return rootView;
@@ -132,4 +182,5 @@ public class ItemDetailFragment extends Fragment {
         super.onDestroy();
         releasePlayer();
     }
+
 }

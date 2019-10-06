@@ -92,7 +92,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     private void setIngredientsTextView(){
         ingredientsTextView = findViewById(R.id.ingredients);
         ingredientsTextView.setText("");
-        for (int i=0 ; i<=9 ; i++){
+        for (int i=0 ; i<=ingredients.size()-1 ; i++){
             ingredientsTextView.append(ingredients.get(i).getrIngredient());
             ingredientsTextView.append(" ");
             ingredientsTextView.append(ingredients.get(i).getiQuantity());
@@ -123,6 +123,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         } else {
             Intent intent = new Intent(this, ItemDetailActivity.class);
             intent.putExtra("steps",steps.get(clickedItemIndex));
+            intent.putParcelableArrayListExtra("step_list",steps);
             startActivity(intent);
         }
     }
