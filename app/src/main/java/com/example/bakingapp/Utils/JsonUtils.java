@@ -21,30 +21,26 @@ public final class JsonUtils {
 
         ArrayList<Recipes> recipesArrayList = new ArrayList<>();
 
-            for (int i = 0; i <= results.length()-1 ; i++) {
-                JSONObject movieData = results.getJSONObject(i);
-                Recipes recipe = new Recipes(
-                        movieData.optString("name"),
-                        movieData.optString("id")
-                );
-                recipesArrayList.add(recipe);
-
-            }
-
+        for (int i = 0; i <= results.length() - 1; i++) {
+            JSONObject movieData = results.getJSONObject(i);
+            Recipes recipe = new Recipes(
+                    movieData.optString("name"),
+                    movieData.optString("id")
+            );
+            recipesArrayList.add(recipe);
+        }
         return recipesArrayList;
-
-
     }
 
-    public static ArrayList<RecipesSteps> parseStepsJson(String json, int recipesId ) throws JSONException {
+    public static ArrayList<RecipesSteps> parseStepsJson(String json, int recipesId) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(recipesId-1);
+        JSONObject jsonObject = root.getJSONObject(recipesId - 1);
         JSONArray results = jsonObject.optJSONArray("steps");
 
         ArrayList<RecipesSteps> stepsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= results.length()-1 ; i++) {
+        for (int i = 0; i <= results.length() - 1; i++) {
             JSONObject stepsData = results.getJSONObject(i);
             RecipesSteps steps = new RecipesSteps(
                     stepsData.optString("id"),
@@ -53,23 +49,19 @@ public final class JsonUtils {
                     stepsData.getString("description")
             );
             stepsArrayList.add(steps);
-
         }
-
         return stepsArrayList;
-
-
     }
 
-    public static ArrayList<RecipesIngredients> parseIngredientsJson(String json, int recipesId ) throws JSONException {
+    public static ArrayList<RecipesIngredients> parseIngredientsJson(String json, int recipesId) throws JSONException {
 
         JSONArray root = new JSONArray(json);
-        JSONObject jsonObject = root.getJSONObject(recipesId-1);
+        JSONObject jsonObject = root.getJSONObject(recipesId - 1);
         JSONArray results = jsonObject.optJSONArray("ingredients");
 
         ArrayList<RecipesIngredients> IngredientsArrayList = new ArrayList<>();
 
-        for (int i = 0; i <= results.length()-1 ; i++) {
+        for (int i = 0; i <= results.length() - 1; i++) {
             JSONObject IngredientsData = results.getJSONObject(i);
             RecipesIngredients Ingredients = new RecipesIngredients(
                     IngredientsData.optString("ingredient"),
@@ -77,11 +69,7 @@ public final class JsonUtils {
                     IngredientsData.optString("measure")
             );
             IngredientsArrayList.add(Ingredients);
-
         }
-
         return IngredientsArrayList;
-
-
     }
 }

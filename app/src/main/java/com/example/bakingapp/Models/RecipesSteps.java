@@ -16,7 +16,7 @@ public class RecipesSteps extends Recipes implements Parcelable {
         this.sInstructions = sInstructions;
     }
 
-    protected RecipesSteps(Parcel in) {
+    private RecipesSteps(Parcel in) {
         sId = in.readString();
         sDescription = in.readString();
         sVideoUrl = in.readString();

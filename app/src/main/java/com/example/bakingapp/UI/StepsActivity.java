@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.bakingapp.Adapters.StepsAdapter;
@@ -14,6 +15,7 @@ import com.example.bakingapp.Models.RecipesSteps;
 import com.example.bakingapp.R;
 import com.example.bakingapp.Utils.JsonUtils;
 import com.example.bakingapp.Utils.NetworkUtil;
+import com.google.android.material.appbar.AppBarLayout;
 
 import org.json.JSONException;
 
@@ -26,6 +28,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * An activity representing a list of Items. This activity
@@ -36,13 +41,22 @@ import androidx.recyclerview.widget.RecyclerView;
  * item sVideoUrl side-by-side using two vertical panes.
  */
 public class StepsActivity extends AppCompatActivity implements StepsAdapter.ListItemClickListener {
-    private static final String TAG = StepsActivity.class.getSimpleName() ;
+    private static final String TAG = StepsActivity.class.getSimpleName();
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.app_bar)
+    AppBarLayout appBar;
+    @BindView(R.id.item_list)
+    RecyclerView stepsRecyclerView;
+
+    @BindView(R.id.frameLayout)
+    FrameLayout frameLayout;
+    @BindView(R.id.ingredients)
+    TextView ingredientsTextView;
 
     private ArrayList<RecipesIngredients> ingredients;
-    private TextView ingredientsTextView;
-
     private ArrayList<RecipesSteps> steps;
-    private RecyclerView stepsRecyclerView;
+
     private Recipes recipes;
 
     /**
@@ -57,7 +71,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         ActionBar actionBar = getSupportActionBar();
@@ -68,7 +82,6 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         final Intent intent = getIntent();
         recipes = intent.getParcelableExtra("recipes");
 
-
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -77,13 +90,12 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             mTwoPane = true;
         }
 
-        stepsRecyclerView = findViewById(R.id.item_list);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL,false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         stepsRecyclerView.setLayoutManager(linearLayoutManager);
 
-        Log.d(TAG, "onCreate: savedInstanceState " +savedInstanceState);
-        if (savedInstanceState != null){
+        Log.d(TAG, "onCreate: savedInstanceState " + savedInstanceState);
+        if (savedInstanceState != null) {
             recipes = savedInstanceState.getParcelable("rec");
             if (actionBar != null) {
                 actionBar.setTitle(recipes.getrName());
@@ -92,7 +104,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             setIngredientsTextView();
             steps = savedInstanceState.getParcelableArrayList("ste");
             setStepsAdapter();
-        }else {
+        } else {
             if (actionBar != null) {
                 actionBar.setTitle(recipes.getrName());
             }
@@ -107,22 +119,15 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("rec",recipes);
-        outState.putParcelableArrayList("ingre",ingredients);
-        outState.putParcelableArrayList("ste",steps);
-        Log.d(TAG, "onSaveInstanceState: "+recipes+ingredients+steps);
+        outState.putParcelable("rec", recipes);
+        outState.putParcelableArrayList("ingre", ingredients);
+        outState.putParcelableArrayList("ste", steps);
+        Log.d(TAG, "onSaveInstanceState: " + recipes + ingredients + steps);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: HEY THEREEEE......");
-    }
-
-    private void setIngredientsTextView(){
-        ingredientsTextView = findViewById(R.id.ingredients);
+    private void setIngredientsTextView() {
         ingredientsTextView.setText("");
-        for (int i=0 ; i<=ingredients.size()-1 ; i++){
+        for (int i = 0; i <= ingredients.size() - 1; i++) {
             ingredientsTextView.append(ingredients.get(i).getrIngredient());
             ingredientsTextView.append(" ");
             ingredientsTextView.append(ingredients.get(i).getiQuantity());
@@ -133,8 +138,8 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     }
 
     private void setStepsAdapter() {
-        Log.d(TAG, "setStepsAdapter: " +steps);
-        StepsAdapter stepsAdapter = new StepsAdapter(steps,this);
+        Log.d(TAG, "setStepsAdapter: " + steps);
+        StepsAdapter stepsAdapter = new StepsAdapter(steps, this);
         stepsRecyclerView.setHasFixedSize(true);
         stepsRecyclerView.setAdapter(stepsAdapter);
     }
@@ -143,8 +148,8 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     public void onListClickItem(int clickedItemIndex) {
         if (mTwoPane) {
             Bundle arguments = new Bundle();
-            arguments.putString("step",steps.get(clickedItemIndex).getsInstructions());
-            arguments.putString("video",steps.get(clickedItemIndex).getsVideoUrl());
+            arguments.putString("step", steps.get(clickedItemIndex).getsInstructions());
+            arguments.putString("video", steps.get(clickedItemIndex).getsVideoUrl());
             ItemDetailFragment fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
             this.getSupportFragmentManager().beginTransaction()
@@ -152,9 +157,23 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
                     .commit();
         } else {
             Intent intent = new Intent(this, ItemDetailActivity.class);
-            intent.putExtra("steps",steps.get(clickedItemIndex));
-            intent.putParcelableArrayListExtra("step_list",steps);
+            intent.putExtra("steps", steps.get(clickedItemIndex));
+            intent.putParcelableArrayListExtra("step_list", steps);
             startActivity(intent);
+        }
+    }
+
+    @OnClick({R.id.toolbar, R.id.app_bar, R.id.ingredients, R.id.item_list})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.toolbar:
+                break;
+            case R.id.app_bar:
+                break;
+            case R.id.ingredients:
+                break;
+            case R.id.item_list:
+                break;
         }
     }
 
@@ -183,11 +202,11 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             if (s != null && !s.equals("")) {
 
                 try {
-                    Log.d(TAG, "onPostExecute: steps "+ingredients);
-                    Log.d(TAG, "onPostExecute: recipes.getrId() "+recipes.getrId());
+                    Log.d(TAG, "onPostExecute: steps " + ingredients);
+                    Log.d(TAG, "onPostExecute: recipes.getrId() " + recipes.getrId());
 
-                    ingredients = JsonUtils.parseIngredientsJson(s,Integer.valueOf(recipes.getrId()));
-                    Log.d(TAG, "onPostExecute: steps "+ingredients);
+                    ingredients = JsonUtils.parseIngredientsJson(s, Integer.valueOf(recipes.getrId()));
+                    Log.d(TAG, "onPostExecute: steps " + ingredients);
                     setIngredientsTextView();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -225,8 +244,8 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
 
                 try {
 
-                    steps = JsonUtils.parseStepsJson(s,Integer.valueOf(recipes.getrId()));
-                    Log.d(TAG, "onPostExecute: steps "+steps);
+                    steps = JsonUtils.parseStepsJson(s, Integer.valueOf(recipes.getrId()));
+                    Log.d(TAG, "onPostExecute: steps " + steps);
                     setStepsAdapter();
                 } catch (JSONException e) {
                     e.printStackTrace();

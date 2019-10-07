@@ -16,18 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesViewHolder> {
 
-    private static final String TAG = RecipesAdapter.class.getSimpleName() ;
+    private static final String TAG = RecipesAdapter.class.getSimpleName();
 
-    ArrayList<Recipes> recipes;
+    private ArrayList<Recipes> recipes;
 
-    public RecipesAdapter(ArrayList<Recipes> recipes, ListItemClickListener listItemClickListener){
+    public RecipesAdapter(ArrayList<Recipes> recipes, ListItemClickListener listItemClickListener) {
         this.recipes = recipes;
         this.listItemClickListener = listItemClickListener;
     }
+
     @NonNull
     @Override
     public RecipesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipes_items,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipes_items, parent, false);
         return new RecipesViewHolder(view);
     }
 
@@ -43,19 +44,21 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesV
 
     final private ListItemClickListener listItemClickListener;
 
-    public interface ListItemClickListener{
+    public interface ListItemClickListener {
         void onListClickItem(int clickedItemIndex);
     }
 
     class RecipesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView recipesTextView;
-        public RecipesViewHolder(@NonNull View itemView) {
+
+        RecipesViewHolder(@NonNull View itemView) {
             super(itemView);
             recipesTextView = itemView.findViewById(R.id.recipes_name);
             itemView.setOnClickListener(this);
         }
-        void bind(int position){
-            Log.d(TAG, "bind: "+recipes.get(position).getrName());
+
+        void bind(int position) {
+            Log.d(TAG, "bind: " + recipes.get(position).getrName());
             recipesTextView.setText(recipes.get(position).getrName());
         }
 

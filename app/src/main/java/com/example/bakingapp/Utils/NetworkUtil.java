@@ -14,11 +14,8 @@ public final class NetworkUtil {
     private NetworkUtil() {
     }
 
-
     private final static String RECIPES_BASE_URL =
             "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
-
-
 
 
     public static URL buildUrl() {
@@ -31,19 +28,15 @@ public final class NetworkUtil {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
         return url;
     }
-
 
     public static String getResponseFromHttpURL(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();
-
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter("\\A");
-
             boolean hasInput = scanner.hasNext();
             if (hasInput) {
                 return scanner.next();

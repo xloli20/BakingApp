@@ -15,7 +15,7 @@ public class RecipesIngredients extends Recipes implements Parcelable {
         this.iMeasure = iMeasure;
     }
 
-    protected RecipesIngredients(Parcel in) {
+    private RecipesIngredients(Parcel in) {
         rIngredient = in.readString();
         iQuantity = in.readString();
         iMeasure = in.readString();

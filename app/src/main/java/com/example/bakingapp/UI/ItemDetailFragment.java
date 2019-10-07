@@ -71,16 +71,19 @@ public class ItemDetailFragment extends Fragment {
         instructionTextView = rootView.findViewById(R.id.instruction);
         playerView = rootView.findViewById(R.id.playerView);
         Activity activity = this.getActivity();
+        assert activity != null;
         appBarLayout = activity.findViewById(R.id.toolbar_layout);
 
         if(savedInstanceState != null){
             currentStep = savedInstanceState.getParcelable("step");
+            assert currentStep != null;
             instructionTextView.setText(currentStep.getsInstructions());
             appBarLayout.setTitle(currentStep.getsDescription());
             initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
             simpleExoPlayer.seekTo(savedInstanceState.getLong("video_position"));
 
         }else {
+            assert getArguments() != null;
             if (getArguments().containsKey("step")) {
                 String step = getArguments().getString("step");
                 String video = getArguments().getString("video");
@@ -88,7 +91,7 @@ public class ItemDetailFragment extends Fragment {
                 initializePlayer(Uri.parse(video));
 
             } else {
-                Intent intent = getActivity().getIntent();
+                Intent intent = Objects.requireNonNull(getActivity()).getIntent();
                 currentStep = intent.getParcelableExtra("steps");
                 steps = intent.getParcelableArrayListExtra("step_list");
                 instructionTextView.setText(currentStep.getsInstructions());
@@ -97,49 +100,41 @@ public class ItemDetailFragment extends Fragment {
                 if (appBarLayout != null) {
                     appBarLayout.setTitle(currentStep.getsDescription());
                 }
+                FloatingActionButton fab = getActivity().findViewById(R.id.fab);
+                fab.setOnClickListener(view -> {
+                    if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
+                        int sid = Integer.valueOf(currentStep.getsId()) +1;
+                        currentStep = steps.get(sid);
+                        appBarLayout.setTitle(currentStep.getsDescription());
+                        instructionTextView.setText(currentStep.getsInstructions());
+                        releasePlayer();
+                        initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+                    }
+                });
             }
         }
-        FloatingActionButton fab = getActivity().findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
-                    int sid = Integer.valueOf(currentStep.getsId()) +1;
-                    currentStep = steps.get(sid);
-                    appBarLayout.setTitle(currentStep.getsDescription());
-                    instructionTextView.setText(currentStep.getsInstructions());
-                    releasePlayer();
-                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
-                }
-            }
-        });
+
         Button nextButton = rootView.findViewById(R.id.next_step);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
-                    int sid = Integer.valueOf(currentStep.getsId()) +1;
-                    currentStep = steps.get(sid);
-                    appBarLayout.setTitle(currentStep.getsDescription());
-                    instructionTextView.setText(currentStep.getsInstructions());
-                    releasePlayer();
-                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
-                }
+        nextButton.setOnClickListener(view -> {
+            if(Integer.valueOf(currentStep.getsId()) < steps.size() -1) {
+                int sid = Integer.valueOf(currentStep.getsId()) +1;
+                currentStep = steps.get(sid);
+                appBarLayout.setTitle(currentStep.getsDescription());
+                instructionTextView.setText(currentStep.getsInstructions());
+                releasePlayer();
+                initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
             }
         });
 
         Button prevButton = rootView.findViewById(R.id.prev_step);
-        prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(Integer.valueOf(currentStep.getsId()) > 0){
-                    int sid = Integer.valueOf(currentStep.getsId()) -1;
-                    currentStep = steps.get(sid);
-                    appBarLayout.setTitle(currentStep.getsDescription());
-                    instructionTextView.setText(currentStep.getsInstructions());
-                    releasePlayer();
-                    initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
-                }
+        prevButton.setOnClickListener(view -> {
+            if(Integer.valueOf(currentStep.getsId()) > 0){
+                int sid = Integer.valueOf(currentStep.getsId()) -1;
+                currentStep = steps.get(sid);
+                appBarLayout.setTitle(currentStep.getsDescription());
+                instructionTextView.setText(currentStep.getsInstructions());
+                releasePlayer();
+                initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
             }
         });
 
@@ -159,8 +154,6 @@ public class ItemDetailFragment extends Fragment {
         }
 
         return rootView;
-
-
     }
 
     @Override

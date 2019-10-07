@@ -17,20 +17,21 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
 
     private ArrayList<RecipesSteps> steps;
 
-    public StepsAdapter(ArrayList<RecipesSteps> steps, ListItemClickListener listItemClickListener){
+    public StepsAdapter(ArrayList<RecipesSteps> steps, ListItemClickListener listItemClickListener) {
         this.steps = steps;
         this.listItemClickListener = listItemClickListener;
     }
 
     private ListItemClickListener listItemClickListener;
-    public interface ListItemClickListener{
+
+    public interface ListItemClickListener {
         void onListClickItem(int clickedItemIndex);
     }
 
     @NonNull
     @Override
     public StepsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_items,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_items, parent, false);
         return new StepsViewHolder(view);
     }
 
@@ -46,12 +47,14 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
 
     class StepsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView descriptionTextView;
+
         StepsViewHolder(@NonNull View itemView) {
             super(itemView);
             descriptionTextView = itemView.findViewById(R.id.id_text);
             itemView.setOnClickListener(this);
         }
-        void bind(int position){
+
+        void bind(int position) {
             descriptionTextView.setText(steps.get(position).getsDescription());
         }
 

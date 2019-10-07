@@ -12,6 +12,9 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * An activity representing a single Item detail screen. This
@@ -21,16 +24,19 @@ import androidx.appcompat.widget.Toolbar;
  */
 public class ItemDetailActivity extends AppCompatActivity {
     private final static String TAG = ItemDetailActivity.class.getSimpleName();
+    @BindView(R.id.detail_toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     //private TextView instructionTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_detail);
-        Toolbar toolbar = findViewById(R.id.detail_toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,5 +88,21 @@ public class ItemDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick({R.id.item_detail_container, R.id.detail_toolbar, R.id.toolbar_layout, R.id.app_bar, R.id.fab})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.item_detail_container:
+                break;
+            case R.id.detail_toolbar:
+                break;
+            case R.id.toolbar_layout:
+                break;
+            case R.id.app_bar:
+                break;
+            case R.id.fab:
+                break;
+        }
     }
 }
