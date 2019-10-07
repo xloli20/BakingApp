@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 /**
@@ -68,27 +70,35 @@ public class ItemDetailFragment extends Fragment {
         //views
         instructionTextView = rootView.findViewById(R.id.instruction);
         playerView = rootView.findViewById(R.id.playerView);
+        Activity activity = this.getActivity();
+        appBarLayout = activity.findViewById(R.id.toolbar_layout);
 
-        if (getArguments().containsKey("step")) {
-            String step = getArguments().getString("step");
-            String video = getArguments().getString("video");
-            instructionTextView.setText(step);
-            initializePlayer(Uri.parse(video));
-
-        } else {
-            Intent intent = getActivity().getIntent();
-            currentStep = intent.getParcelableExtra("steps");
-            steps = intent.getParcelableArrayListExtra("step_list");
+        if(savedInstanceState != null){
+            currentStep = savedInstanceState.getParcelable("step");
             instructionTextView.setText(currentStep.getsInstructions());
+            appBarLayout.setTitle(currentStep.getsDescription());
             initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+            simpleExoPlayer.seekTo(savedInstanceState.getLong("video_position"));
 
-            Activity activity = this.getActivity();
-            appBarLayout = activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(currentStep.getsDescription());
+        }else {
+            if (getArguments().containsKey("step")) {
+                String step = getArguments().getString("step");
+                String video = getArguments().getString("video");
+                instructionTextView.setText(step);
+                initializePlayer(Uri.parse(video));
+
+            } else {
+                Intent intent = getActivity().getIntent();
+                currentStep = intent.getParcelableExtra("steps");
+                steps = intent.getParcelableArrayListExtra("step_list");
+                instructionTextView.setText(currentStep.getsInstructions());
+                initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
+
+                if (appBarLayout != null) {
+                    appBarLayout.setTitle(currentStep.getsDescription());
+                }
             }
         }
-
         FloatingActionButton fab = getActivity().findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,12 +154,23 @@ public class ItemDetailFragment extends Fragment {
             params.height = height;
             playerView.setLayoutParams(params);
 
-            Activity activity = this.getActivity();
             AppBarLayout appBarLayout = activity.findViewById(R.id.app_bar);
             appBarLayout.setVisibility(View.GONE);
         }
 
         return rootView;
+
+
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("step",currentStep);
+        outState.putLong("video_position",simpleExoPlayer.getCurrentPosition());
+        Log.d(TAG, "onSaveInstanceState: position " +simpleExoPlayer.getContentPosition());
+
     }
 
     private void initializePlayer(Uri mediaUri) {

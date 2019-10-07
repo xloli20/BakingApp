@@ -60,15 +60,14 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         final Intent intent = getIntent();
         recipes = intent.getParcelableExtra("recipes");
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(recipes.getrName());
-        }
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -83,10 +82,41 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL,false);
         stepsRecyclerView.setLayoutManager(linearLayoutManager);
 
-        URL url = NetworkUtil.buildUrl();
-        new StepsQueryTask().execute(url);
+        Log.d(TAG, "onCreate: savedInstanceState " +savedInstanceState);
+        if (savedInstanceState != null){
+            recipes = savedInstanceState.getParcelable("rec");
+            if (actionBar != null) {
+                actionBar.setTitle(recipes.getrName());
+            }
+            ingredients = savedInstanceState.getParcelableArrayList("ingre");
+            setIngredientsTextView();
+            steps = savedInstanceState.getParcelableArrayList("ste");
+            setStepsAdapter();
+        }else {
+            if (actionBar != null) {
+                actionBar.setTitle(recipes.getrName());
+            }
 
-        new IngredientsQueryTask().execute(url);
+            URL url = NetworkUtil.buildUrl();
+            new StepsQueryTask().execute(url);
+
+            new IngredientsQueryTask().execute(url);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("rec",recipes);
+        outState.putParcelableArrayList("ingre",ingredients);
+        outState.putParcelableArrayList("ste",steps);
+        Log.d(TAG, "onSaveInstanceState: "+recipes+ingredients+steps);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: HEY THEREEEE......");
     }
 
     private void setIngredientsTextView(){
