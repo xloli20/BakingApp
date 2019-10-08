@@ -4,4 +4,6 @@
     <string name="ingredients">Ingredients:</string>
     <string name="bla">blablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablabla</string>
     <string name="error_message">No recipes found, plz try again later :\'(</string>
+    <string name="add_widget">Add widget</string>
+    <string name="appwidget_text">I don\'t know !!!!!</string>
 </resources>
