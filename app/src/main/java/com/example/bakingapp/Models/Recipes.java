@@ -7,7 +7,7 @@ public class Recipes implements Parcelable {
     private String rName;
     private String rId;
 
-    Recipes() {
+    public Recipes() {
     }
 
     public Recipes(String rName, String rId) {
