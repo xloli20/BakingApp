@@ -1,18 +1,24 @@
 package com.example.bakingapp.UI;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bakingapp.Adapters.StepsAdapter;
 import com.example.bakingapp.Models.Recipes;
 import com.example.bakingapp.Models.RecipesIngredients;
 import com.example.bakingapp.Models.RecipesSteps;
 import com.example.bakingapp.R;
+import com.example.bakingapp.RecipeAppWidget;
 import com.example.bakingapp.Utils.JsonUtils;
 import com.example.bakingapp.Utils.NetworkUtil;
 import com.google.android.material.appbar.AppBarLayout;
@@ -48,7 +54,6 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
     AppBarLayout appBar;
     @BindView(R.id.item_list)
     RecyclerView stepsRecyclerView;
-
     @BindView(R.id.frameLayout)
     FrameLayout frameLayout;
     @BindView(R.id.ingredients)
@@ -64,16 +69,17 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
      * device.
      */
     private boolean mTwoPane;
-    private StepsActivity mParentActivity;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps);
+
         ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -89,7 +95,6 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         stepsRecyclerView.setLayoutManager(linearLayoutManager);
@@ -143,6 +148,27 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         stepsRecyclerView.setHasFixedSize(true);
         stepsRecyclerView.setAdapter(stepsAdapter);
     }
+    private void addWidget() {
+        StringBuilder ingredient = new StringBuilder();
+        for (int i = 0; i <= ingredients.size() - 1; i++) {
+            ingredient.append(ingredients.get(i).getrIngredient());
+            ingredient.append(" ");
+            ingredient.append(ingredients.get(i).getiQuantity());
+            ingredient.append(" ");
+            ingredient.append(ingredients.get(i).getiMeasure());
+            ingredient.append("\n");
+        }
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipeAppWidget.class));
+        if (appWidgetIds.length == 0) {
+            Toast.makeText(this, "Please make a home screen widget first!", Toast.LENGTH_SHORT).show();
+        } else {
+            for (int appWidgetId : appWidgetIds) {
+                RecipeAppWidget.updateAppWidget(this, appWidgetManager, appWidgetId, recipes.getrName(), ingredient.toString());
+            }
+        }
+    }
 
     @Override
     public void onListClickItem(int clickedItemIndex) {
@@ -177,6 +203,21 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.widget,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.widget){
+            addWidget();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public class IngredientsQueryTask extends AsyncTask<URL, Void, String> {
 
         @Override
@@ -198,20 +239,13 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
 
         @Override
         protected void onPostExecute(String s) {
-
             if (s != null && !s.equals("")) {
-
                 try {
-                    Log.d(TAG, "onPostExecute: steps " + ingredients);
-                    Log.d(TAG, "onPostExecute: recipes.getrId() " + recipes.getrId());
-
                     ingredients = JsonUtils.parseIngredientsJson(s, Integer.valueOf(recipes.getrId()));
-                    Log.d(TAG, "onPostExecute: steps " + ingredients);
                     setIngredientsTextView();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             } else {
             }
         }
@@ -238,19 +272,14 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
 
         @Override
         protected void onPostExecute(String s) {
-
             if (s != null && !s.equals("")) {
                 stepsRecyclerView.setVisibility(View.VISIBLE);
-
                 try {
-
                     steps = JsonUtils.parseStepsJson(s, Integer.valueOf(recipes.getrId()));
-                    Log.d(TAG, "onPostExecute: steps " + steps);
                     setStepsAdapter();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             } else {
             }
         }

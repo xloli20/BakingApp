@@ -14,13 +14,13 @@ import com.example.bakingapp.UI.MainActivity;
  */
 public class RecipeAppWidget extends AppWidgetProvider {
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                int appWidgetId,String title, String body ) {
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_app_widget);
-        views.setTextViewText(R.id.recipes_name, "recipe name");
-        views.setTextViewText(R.id.ingredients, "" );
+        views.setTextViewText(R.id.recipes_name, title);
+        views.setTextViewText(R.id.ingredients, body );
         views.setTextViewText(R.id.ingredients_title, context.getString(R.string.ingredients));
 
         //to open the app when widget clicked
@@ -36,7 +36,7 @@ public class RecipeAppWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId, context.getString(R.string.app_name), context.getString(R.string.app_name));
         }
     }
 
