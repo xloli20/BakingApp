@@ -176,6 +176,7 @@ public class StepsActivity extends AppCompatActivity implements StepsAdapter.Lis
             Bundle arguments = new Bundle();
             arguments.putString("step", steps.get(clickedItemIndex).getsInstructions());
             arguments.putString("video", steps.get(clickedItemIndex).getsVideoUrl());
+            arguments.putParcelable("steps",steps.get(clickedItemIndex));
             ItemDetailFragment fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
             this.getSupportFragmentManager().beginTransaction()

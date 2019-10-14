@@ -87,6 +87,7 @@ public class ItemDetailFragment extends Fragment {
             if (getArguments().containsKey("step")) {
                 String step = getArguments().getString("step");
                 String video = getArguments().getString("video");
+                currentStep = getArguments().getParcelable("steps");
                 instructionTextView.setText(step);
                 initializePlayer(Uri.parse(video));
 
