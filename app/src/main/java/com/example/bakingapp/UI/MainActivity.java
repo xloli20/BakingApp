@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements RecipesAdapter.ListItemClickListener {
 
@@ -36,14 +35,13 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Li
     @BindView(R.id.recipes_recycler_view)
     RecyclerView recipesRecyclerView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        errorMessage = findViewById(R.id.error_message);
-        recipesRecyclerView = findViewById(R.id.recipes_recycler_view);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, numberOfColumns());
         recipesRecyclerView.setLayoutManager(gridLayoutManager);
@@ -77,14 +75,6 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Li
         startActivity(intent);
     }
 
-    @OnClick({R.id.error_message, R.id.recipes_recycler_view})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.error_message:
-            case R.id.recipes_recycler_view:
-                break;
-        }
-    }
 
     public class RecipesQueryTask extends AsyncTask<URL, Void, String> {
 

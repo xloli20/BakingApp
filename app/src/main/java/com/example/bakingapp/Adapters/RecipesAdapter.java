@@ -48,7 +48,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesV
         void onListClickItem(int clickedItemIndex);
     }
 
-    class RecipesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RecipesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView recipesTextView;
 
         RecipesViewHolder(@NonNull View itemView) {

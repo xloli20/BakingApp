@@ -76,7 +76,7 @@ public class ItemDetailFragment extends Fragment {
 
         if(savedInstanceState != null){
             currentStep = savedInstanceState.getParcelable("step");
-            assert currentStep != null;
+            steps = savedInstanceState.getParcelableArrayList("steps");
             instructionTextView.setText(currentStep.getsInstructions());
             appBarLayout.setTitle(currentStep.getsDescription());
             initializePlayer(Uri.parse(currentStep.getsVideoUrl()));
@@ -161,6 +161,7 @@ public class ItemDetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("step",currentStep);
+        outState.putParcelableArrayList("steps",steps);
         outState.putLong("video_position",simpleExoPlayer.getCurrentPosition());
         Log.d(TAG, "onSaveInstanceState: position " +simpleExoPlayer.getContentPosition());
 
